@@ -77,7 +77,7 @@ std::queue<Token> rpn(std::vector<Token> tokens) {
         else if (t.type == 'O') {
             if (operat.empty()) operat.push(t);
             else {
-                while (!operat.empty() && getPrecendence(operat.top()) <= getPrecendence(t)) {
+                while (!operat.empty() && getPrecendence(operat.top()) >= getPrecendence(t)) {
                     rpn.push(operat.top());
                     operat.pop();
                 }
@@ -93,15 +93,40 @@ std::queue<Token> rpn(std::vector<Token> tokens) {
     }  // new types added after here
     return rpn;
 }
+int evaluateRPN(std::queue<Token> rpn) {
+    std::stack<int> res;
+    while (!rpn.empty()) {
+        Token t = rpn.front();
+        if (t.type == 'N') {
+            res.push(t.value);
+            rpn.pop();
+        }
+        else if (t.type == 'O') {
+            int b = res.top();
+            res.pop();
+            int a = res.top();
+            res.pop();
+            switch (t.op) {
+            case'*': res.push(a * b);break;
+            case'/': res.push(a / b);break;
+            case'+': res.push(a + b);break;
+            case'-': res.push(a - b);break;
+            }
+            rpn.pop();
+        }
 
-int main()
-{
+    }
+    return res.top();
+}
+
+int main(){
+    std::cout << "please enter an expression with numbers from 1 - 9 and operators '*/+-': ";
     std::string input{};
     std::cin >> input;
     std::vector<Token> tokens = tokenize(input); // only numbers from 1-9 and operators "*/+-" for version 1. 
-    std::queue<Token> rpnfunktion = rpn(tokens);
-      
-    
+    std::queue<Token> rpnFunktion = rpn(tokens);
+    int result = evaluateRPN(rpnFunktion);
+    std::cout << "the entered expression equates to: " << result;
 }
 
 
