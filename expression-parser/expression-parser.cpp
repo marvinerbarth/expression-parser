@@ -12,6 +12,8 @@ struct Token {
     };
 std::vector<Token> tokenize(std::string input) {
     std::vector<Token> tokens;
+    bool preWasInt = false;
+    int currVal{};
     while (!input.empty()) {
         char c = input.front();
         switch (c) {
@@ -19,11 +21,17 @@ std::vector<Token> tokenize(std::string input) {
         case'/':
         case'+':
         case'-': {
+            Token n;
+            n.type = 'N';
+            n.value = currVal;
+            n.op = ' ';
+            tokens.push_back(n);
             Token o;
             o.type = 'O';
             o.value = 0;
             o.op = c;
             tokens.push_back(o);
+            preWasInt = false;
             break;
         }
         case'0':
@@ -36,13 +44,18 @@ std::vector<Token> tokenize(std::string input) {
         case'7':
         case'8':
         case'9': {
-            Token n;
-            n.type = 'N';
-            n.value = c - '0';
-            n.op = ' ';
-            tokens.push_back(n);
+            if (!preWasInt) {
+                currVal = c - '0';
+                preWasInt = true;
+            }
+            else {
+                currVal = currVal * 10 + (c - '0');
+            }
+            
             break;
         }
+        case' ': 
+            break;
         default:
             /*work on stop
               so the programm wont work when a wrong input is inputed, maybe even considering rules (operator cant follow operator etc.)
@@ -50,6 +63,13 @@ std::vector<Token> tokenize(std::string input) {
             std::cout << "wrong input \n";break;
         }
         input.erase(0, 1);
+    }
+    if(preWasInt) {
+        Token n;
+        n.type = 'N';
+        n.value = currVal;
+        n.op = ' ';
+        tokens.push_back(n);
     }
     return tokens;
 }
@@ -120,10 +140,10 @@ int evaluateRPN(std::queue<Token> rpn) {
 }
 
 int main(){
-    std::cout << "please enter an expression with numbers from 1 - 9 and operators '*/+-': ";
+    std::cout << "please enter an expression with with the limitation of operators '*/+-': \n";
     std::string input{};
-    std::cin >> input;
-    std::vector<Token> tokens = tokenize(input); // only numbers from 1-9 and operators "*/+-" for version 1. 
+    std::getline(std::cin, input);
+    std::vector<Token> tokens = tokenize(input);  
     std::queue<Token> rpnFunktion = rpn(tokens);
     int result = evaluateRPN(rpnFunktion);
     std::cout << "the entered expression equates to: " << result;
