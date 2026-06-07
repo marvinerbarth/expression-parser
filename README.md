@@ -1,14 +1,37 @@
-# expression-parser
-Expression parser in C++ supporting nested arithmetic expressions
+# Expression Parser (C++)
+
+A simple arithmetic expression parser that evaluates infix expressions using tokenization, the Shunting Yard algorithm, and Reverse Polish Notation (RPN).
+
+---
+
 ## Features
-- [x] Tokenizer (basics)
-- [x] Shunting Yard Algorithm (basics)
-- [x] RPN Evaluation
 
-### planned :
-- [] evaluating numbers bigger than 9
-- [] using parentheses correctly
-- [] ignore whitespaceses
-- [] correct error management
+- Tokenizer for expressions
+- Multi-digit number support
+- Whitespace handling
+- Shunting Yard (infix → postfix)
+- RPN evaluation
+- Basic operator precedence (+ - * /)
 
+---
 
+## Planned
+
+- Parentheses support
+- Better error handling
+- Unary operators (like negative numbers)
+
+---
+
+## current Limitations
+
+- Only works with integers
+- No proper input validation
+- Undefined behavior on invalid expressions
+- No variables or functions
+
+---
+
+## Notes
+
+Built as my first step into parsing and compiler-style logic in C++.
