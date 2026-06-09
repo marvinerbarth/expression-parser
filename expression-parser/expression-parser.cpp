@@ -7,52 +7,27 @@
 #include <string>    
 #include <cstdlib> 
 
+enum class Tokentype
+{
+    NUMBER,
+    OPERATOR,
+    LEFTPARENTHESIS,
+    RIGHTPARENTHESIS
+};
 struct Token {
-        char type;
+        Tokentype type;
         int value;
         char op;
     };
 std::vector<Token> tokenize(std::string input) {
     std::vector<Token> tokens;
     bool preWasInt = false;
-    int parenthesesOpened{};
+    bool preWasClosingParenthesis = false;
     int currVal{};
 
-    while (!input.empty()) {
-        char c = input.front();
-
-        switch (c) {
-        case '*':
-        case '/':
-        case '+':
-        case '-': {
-            Token n;
-            n.type = 'N';
-            n.value = currVal;
-            n.op = ' ';
-            tokens.push_back(n);
-
-            Token o;
-            o.type = 'O';
-            o.value = 0;
-            o.op = c;
-            tokens.push_back(o);
-
-            preWasInt = false;
-            currVal = 0;
-            break;
-        }
-
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9': {
+    for (char c : input) {
+        
+        if (c >= '0' && c <= '9') {
             if (!preWasInt) {
                 currVal = c - '0';
                 preWasInt = true;
@@ -60,40 +35,46 @@ std::vector<Token> tokenize(std::string input) {
             else {
                 currVal = currVal * 10 + (c - '0');
             }
-            break;
+            preWasClosingParenthesis = false;
+        }
+        else if(c == '+' || c == '-' || c == '*' || c == '/') {
+            if (preWasInt) {
+                tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
+            }
+            tokens.push_back({ Tokentype::OPERATOR , 0, c });
+            preWasClosingParenthesis = false;
+            preWasInt = false;
+            currVal = 0;
+        }
+        else if (c == '(') {
+
+            if (preWasInt || preWasClosingParenthesis) {
+                if (preWasInt) tokens.push_back({ Tokentype::NUMBER , currVal, ' ' }); 
+                
+                tokens.push_back({ Tokentype::OPERATOR , 0 , '*' });
+            }
+            
+            tokens.push_back({ Tokentype::LEFTPARENTHESIS , 0, c });
+            preWasInt = false;
+            preWasClosingParenthesis = false;
+            currVal = 0;
+        }
+        else if (c == ')') {
+            if (preWasInt) {
+                tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
+            }
+            tokens.push_back({ Tokentype::RIGHTPARENTHESIS , 0, c });
+            preWasClosingParenthesis = true;
+            preWasInt = false;
+            currVal = 0;
+            
         }
 
-        case ' ':
-            break;
-
-        case '(':
-            parenthesesOpened++;
-            tokens.push_back({ 'P', 0, '(' });
-            break;
-
-        case ')':
-            if (parenthesesOpened > 0) {
-                parenthesesOpened--;
-                tokens.push_back({ 'C', 0, ')' }); 
-                preWasInt = false;
-                currVal = 0;
-            }
-            else {
-                std::cout << "missing opening parenthesis\n";
-                std::exit(0);
-            }
-            break;
-
-        default:
-            std::cout << "wrong input\n";
-            std::exit(0);
-        }
-
-        input.erase(0, 1);
+        
     }
 
     if (preWasInt) {
-        tokens.push_back({ 'N', currVal, ' ' });
+        tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
         preWasInt = false;
         currVal = 0;
     }
@@ -118,36 +99,45 @@ int getPrecendence (Token t) {
 std::queue<Token> rpn(std::vector<Token> tokens) {
     std::stack<Token> operat;
     std::queue<Token> out;
+    int parenthesis{ 0 };
 
     for (int i = 0; i < tokens.size(); ++i) {
         Token t = tokens[i];
 
-        if (t.type == 'N') {
+        if (t.type == Tokentype::NUMBER) {
             out.push(t);
         }
 
-        else if (t.type == 'O') {
-            while (!operat.empty() &&
-                operat.top().type == 'O' &&
-                getPrecendence(operat.top()) >= getPrecendence(t)) {
+        else if (t.type == Tokentype::OPERATOR) {
+            while (!operat.empty()  && 
+            operat.top().type == Tokentype::OPERATOR && 
+            getPrecendence(operat.top()) >= getPrecendence(t)) {
+
                 out.push(operat.top());
                 operat.pop();
             }
             operat.push(t);
         }
+        
 
-        else if (t.type == 'P') {
+        else if (t.type == Tokentype::LEFTPARENTHESIS) {
+            
             operat.push(t);
+            parenthesis++;
         }
 
-        else if (t.type == 'C') {
-            while (!operat.empty() && operat.top().op != '(') {
+        else if (t.type == Tokentype::RIGHTPARENTHESIS) {
+            if (parenthesis <= 0) std::exit(0);
+            while (operat.top().op != '(') {
                 out.push(operat.top());
                 operat.pop();
+                
             }
-            if (!operat.empty()) operat.pop(); // remove '('
+            parenthesis--;
+            if (!operat.empty()) operat.pop(); 
         }
     }
+    if (parenthesis != 0) std::exit(0);
 
     while (!operat.empty()) {
         out.push(operat.top());
@@ -162,11 +152,11 @@ int evaluateRPN(std::queue<Token> rpn) {
     while (!rpn.empty()) {
         Token t = rpn.front();
 
-        if (t.type == 'N') {
+        if (t.type == Tokentype::NUMBER) {
             res.push(t.value);
         }
 
-        else if (t.type == 'O') {
+        else if (t.type == Tokentype::OPERATOR) {
             
 
             int b = res.top(); res.pop();
@@ -187,7 +177,7 @@ int evaluateRPN(std::queue<Token> rpn) {
 }
 
 int main(){
-    std::cout << "please enter an expression with with the limitation of operators '*/+-': \n";
+    std::cout << "please enter an expression; operators availeable '+-*/' \n";
     std::string input{};
     std::getline(std::cin, input);
     std::vector<Token> tokens = tokenize(input);  

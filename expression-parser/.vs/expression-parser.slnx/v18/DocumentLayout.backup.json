@@ -17,7 +17,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
@@ -27,7 +27,7 @@
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\include\\deque",
               "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\include\\deque",
               "RelativeToolTip": "..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\include\\deque",
-              "ViewState": "AgIAAE4EAAAAAAAAAAAQwGYEAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAAC8EAAAAAAAAAAAWwFkEAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-06-06T15:46:47.087Z",
               "EditorCaption": ""
@@ -40,7 +40,7 @@
               "RelativeDocumentMoniker": "expression-parser.cpp",
               "ToolTip": "C:\\Users\\marvi\\expression-parser\\expression-parser\\expression-parser.cpp",
               "RelativeToolTip": "expression-parser.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKkAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAADEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-06-04T12:23:27.454Z",
               "EditorCaption": ""
@@ -48,6 +48,20 @@
           ]
         }
       ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "132f24fd-9bab-454b-856a-506a5757bce7",
+        "Display": 1,
+        "X": -5,
+        "Y": 169,
+        "Width": 1090,
+        "Height": 1194,
+        "WindowState": 0
+      },
+      "DocumentGroups": []
     }
   ]
 }
