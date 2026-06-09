@@ -12,12 +12,13 @@ A simple arithmetic expression parser that evaluates infix expressions using tok
 - Shunting Yard (infix → postfix)
 - RPN evaluation
 - Basic operator precedence (+ - * /)
+- Parentheses support
 
 ---
 
 ## Planned
 
-- Parentheses support
+
 - Better error handling
 - Unary operators (like negative numbers)
 
