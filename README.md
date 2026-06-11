@@ -1,38 +1,34 @@
+Markdown
 # Expression Parser (C++)
 
-A simple arithmetic expression parser that evaluates infix expressions using tokenization, the Shunting Yard algorithm, and Reverse Polish Notation (RPN).
+A simple arithmetic expression parser built to learn how compilers handle mathematical input. It tokenizes standard infix math strings, converts them using the Shunting Yard algorithm, and evaluates them via Reverse Polish Notation (RPN).
 
 ---
 
 ## Features
 
-- Tokenizer for expressions
-- Multi-digit number support
-- Whitespace handling
-- Shunting Yard (infix → postfix)
-- RPN evaluation
-- Basic operator precedence (+ - * /)
-- Parentheses support
+* **Tokenizer:** Handles multi-digit integers and ignores whitespace.
+* **Precedence & Brackets:** Respects standard math rules (+ - * /) and handles `()` groups.
+* **RPN Engine:** Converts infix expressions to postfix and computes the final result.
 
 ---
 
-## Planned
+## Planned Updates
 
-
-- Better error handling
-- Unary operators (like negative numbers)
+* **Abstract Syntax Tree (AST):** Move from a flat RPN stack to a proper tree structure for better expression tracking.
+* **Unary Operators:** Add support for negative numbers (e.g., `-5 + 3`).
+* **Error Handling:** Catch invalid syntax instead of letting the program crash.
 
 ---
 
-## current Limitations
+## Limitations
 
-- Only works with integers
-- No proper input validation
-- Undefined behavior on invalid expressions
-- No variables or functions
+* **Integers only:** No decimal/floating-point support yet.
+* **No Validation:** Passing broken or malformed strings causes undefined behavior.
+* **No Variables:** Limited to raw numbers (no variables or functions like `sin`/`cos`).
 
 ---
 
 ## Notes
 
-Built as my first step into parsing and compiler-style logic in C++.
+This is my first project exploring compiler-style logic, stacks, and token streams in C++.
