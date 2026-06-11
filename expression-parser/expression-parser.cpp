@@ -6,83 +6,61 @@
 #include <queue>      
 #include <string>    
 #include <cstdlib> 
+#include <variant>
+#include <string_view>
 
 enum class Tokentype
 {
     NUMBER,
     OPERATOR,
     LEFTPARENTHESIS,
-    RIGHTPARENTHESIS
+    RIGHTPARENTHESIS, 
+    UNARYMINUS
 };
 struct Token {
         Tokentype type;
-        int value;
-        char op;
+        std::variant<int, char> value;
     };
-std::vector<Token> tokenize(std::string input) {
+std::vector<Token> tokenize(std::string_view input) {
     std::vector<Token> tokens;
-    bool preWasInt = false;
-    bool preWasClosingParenthesis = false;
-    int currVal{};
 
-    for (char c : input) {
+    for (size_t i = 0; i < input.size(); ++i) {
+        char c = input[i];
+
         
-        if (c >= '0' && c <= '9') {
-            if (!preWasInt) {
-                currVal = c - '0';
-                preWasInt = true;
-            }
-            else {
-                currVal = currVal * 10 + (c - '0');
-            }
-            preWasClosingParenthesis = false;
+        if (std::isspace(static_cast<unsigned char>(c))) {
+            continue;
         }
-        else if(c == '+' || c == '-' || c == '*' || c == '/') {
-            if (preWasInt) {
-                tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
+
+        
+        if (std::isdigit(static_cast<unsigned char>(c))) {
+            int val = 0;
+
+            
+            while (i < input.size() && std::isdigit(static_cast<unsigned char>(input[i]))) {
+                val = (val * 10) + (input[i] - '0');
+                i++;
             }
-            tokens.push_back({ Tokentype::OPERATOR , 0, c });
-            preWasClosingParenthesis = false;
-            preWasInt = false;
-            currVal = 0;
+            i--; 
+
+            tokens.emplace_back(Token{ Tokentype::NUMBER, val});
+        }
+        
+        else if (c == '+' || c == '-' || c == '*' || c == '/') {
+            tokens.emplace_back(Token{ Tokentype::OPERATOR, c});
         }
         else if (c == '(') {
-
-            if (preWasInt || preWasClosingParenthesis) {
-                if (preWasInt) tokens.push_back({ Tokentype::NUMBER , currVal, ' ' }); 
-                
-                tokens.push_back({ Tokentype::OPERATOR , 0 , '*' });
-            }
-            
-            tokens.push_back({ Tokentype::LEFTPARENTHESIS , 0, c });
-            preWasInt = false;
-            preWasClosingParenthesis = false;
-            currVal = 0;
+            tokens.emplace_back(Token{ Tokentype::LEFTPARENTHESIS, c });
         }
         else if (c == ')') {
-            if (preWasInt) {
-                tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
-            }
-            tokens.push_back({ Tokentype::RIGHTPARENTHESIS , 0, c });
-            preWasClosingParenthesis = true;
-            preWasInt = false;
-            currVal = 0;
-            
+            tokens.emplace_back(Token{ Tokentype::RIGHTPARENTHESIS, c });
         }
-
-        
-    }
-
-    if (preWasInt) {
-        tokens.push_back({ Tokentype::NUMBER , currVal, ' ' });
-        preWasInt = false;
-        currVal = 0;
     }
 
     return tokens;
 }
 
-int getPrecendence (Token t) {
+int getPrecendence ( const Token t) {
     switch (t.op) {
         case'+':
         case'-': {
@@ -96,7 +74,7 @@ int getPrecendence (Token t) {
     }
 }
 
-std::queue<Token> rpn(std::vector<Token> tokens) {
+std::queue<Token> rpn(const std::vector<Token>& tokens) {
     std::stack<Token> operat;
     std::queue<Token> out;
     int parenthesis{ 0 };
@@ -128,7 +106,7 @@ std::queue<Token> rpn(std::vector<Token> tokens) {
 
         else if (t.type == Tokentype::RIGHTPARENTHESIS) {
             if (parenthesis <= 0) std::exit(0);
-            while (operat.top().op != '(') {
+            while (operat.top().value != '(') {
                 out.push(operat.top());
                 operat.pop();
                 
