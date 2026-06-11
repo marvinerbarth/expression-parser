@@ -1,0 +1,18 @@
+# Block the hidden VS state folder
+.vs/
+
+# Block ANY folder containing Debug or Release build files
+*Debug/
+*Release/
+*.23bddf9b/
+
+# Block specific heavy binary extensions anywhere in the project
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.idb
+*.tlog
+*.log
+*.lastbuildstate
+*.recipe
