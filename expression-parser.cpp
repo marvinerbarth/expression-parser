@@ -61,7 +61,8 @@ std::vector<Token> tokenize(std::string_view input) {
 }
 
 int getPrecendence ( const Token t) {
-    switch (t.op) {
+    if (const char* c = std::get_if<char>(&t.value)) {
+        switch (*c) {
         case'+':
         case'-': {
             return 1;
@@ -71,6 +72,7 @@ int getPrecendence ( const Token t) {
             return 2;
         } // operator with higher precendence added  after here
         default: return 0;
+        }
     }
 }
 
@@ -78,6 +80,7 @@ std::queue<Token> rpn(const std::vector<Token>& tokens) {
     std::stack<Token> operat;
     std::queue<Token> out;
     int parenthesis{ 0 };
+    int implicitMult{ 0 };
 
     for (int i = 0; i < tokens.size(); ++i) {
         Token t = tokens[i];
@@ -99,17 +102,23 @@ std::queue<Token> rpn(const std::vector<Token>& tokens) {
         
 
         else if (t.type == Tokentype::LEFTPARENTHESIS) {
-            
+            if (i > 0 && tokens[i-1].type != Tokentype::OPERATOR) {
+                implicitMult++;
+            }
             operat.push(t);
             parenthesis++;
         }
 
         else if (t.type == Tokentype::RIGHTPARENTHESIS) {
             if (parenthesis <= 0) std::exit(0);
-            while (operat.top().value != '(') {
+            while (operat.top().type != Tokentype::LEFTPARENTHESIS) {
                 out.push(operat.top());
                 operat.pop();
                 
+            }
+            if (implicitMult > 0) {
+                out.push(Token{ Tokentype::OPERATOR, '*' });
+                implicitMult--;
             }
             parenthesis--;
             if (!operat.empty()) operat.pop(); 
@@ -131,7 +140,7 @@ int evaluateRPN(std::queue<Token> rpn) {
         Token t = rpn.front();
 
         if (t.type == Tokentype::NUMBER) {
-            res.push(t.value);
+            res.push(std::get<int>(t.value));
         }
 
         else if (t.type == Tokentype::OPERATOR) {
@@ -139,12 +148,13 @@ int evaluateRPN(std::queue<Token> rpn) {
 
             int b = res.top(); res.pop();
             int a = res.top(); res.pop();
-
-            switch (t.op) {
-            case '*': res.push(a * b); break;
-            case '/': res.push(a / b); break;
-            case '+': res.push(a + b); break;
-            case '-': res.push(a - b); break;
+            if (const char* c = std::get_if<char>(&t.value)) {
+                switch (*c) {
+                case '*': res.push(a * b); break;
+                case '/': res.push(a / b); break;
+                case '+': res.push(a + b); break;
+                case '-': res.push(a - b); break;
+                }
             }
         }
 
@@ -153,15 +163,25 @@ int evaluateRPN(std::queue<Token> rpn) {
 
     return res.top();
 }
-
-int main(){
-    std::cout << "please enter an expression; operators availeable '+-*/' \n";
+int main() {
+    std::cout << "Enter expressions using '+-*/'. Press 0 to exit.\n\n";
     std::string input{};
-    std::getline(std::cin, input);
-    std::vector<Token> tokens = tokenize(input);  
-    std::queue<Token> rpnFunktion = rpn(tokens);
-    int result = evaluateRPN(rpnFunktion);
-    std::cout << "the entered expression equates to: " << result;
+
+    while (std::cout << "please enter an expression: " && std::getline(std::cin, input)) {
+        if (input.empty()) {
+            continue;
+        }if (input == "0") {
+            std::exit(0);
+        }
+
+        std::vector<Token> tokens = tokenize(input);
+        std::queue<Token> rpnFunktion = rpn(tokens);
+        int result = evaluateRPN(rpnFunktion);
+
+        std::cout << "the entered expression equates to: " << result << "\n\n";
+    }
+
+    return 0;
 }
 
 
